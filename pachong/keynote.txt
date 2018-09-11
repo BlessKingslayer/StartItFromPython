@@ -1,0 +1,32 @@
+1. js 反混淆  网站: http://www.bm8.com.cn/jsConfusion/
+2. python 字符串中包含 \u 开头的unicode编码（\u 后的十六进制字符串是相应汉字的utf-16编码）
+    将其转换为汉字的处理方式: 字符串.encode('utf-8').decode('unicode_escape')
+    1) 汉字转Unicode测试网站: http://www.bangnishouji.com/tools/chtounicode.html
+    2) 汉字编码查询
+
+3. URI 统一资源标识符
+   URL 统一资源定位符
+   URN 统一资源名称(不指定如何定位资源)
+   URI 包含 URL 和 URN 
+   由于现在URN普遍用的比较少，说的URI基本表示URL
+
+4. URL 开头会指明访问资源所需要的协议类型(http \ https \ ftp \ sftp)
+
+5. GET请求提交的数据最多只有1024字节
+
+6. Referer：此内容用来标识这个请求是从哪个页面发过来的，服务器可以拿到这一信息并做相应的处理，如作来源统计、防盗链处理等。
+
+7.User-Agent：简称UA，它是一个特殊的字符串头，可以使服务器识别客户使用的操作系统及版本、浏览器及版本等信息。在做爬虫时加上此信息，可以伪装为浏览器；如果不加，很可能会被识别出为爬虫。
+
+8. Content-Type：也叫互联网媒体类型（Internet Media Type）或者MIME类型，在HTTP协议消息头中，它用来表示具体请求中的媒体类型信息。
+    具体信息: http://tool.oschina.net/commons
+
+9. Content-Type 对照 提交数据的方式
+    application/x-www-form-urlencoded  表单数据
+    multipart/form-data             表单文件上传
+    application/json                序列化JSON数据
+    text/xml                        XML数据
+
+10. Cookies和会话需要配合，一个处于客户端，一个处于服务端，二者共同协作，就实现了登录会话控制。
+
+11. 会话和几种状态保持方案理解：http://www.mamicode.com/info-detail-46545.html
