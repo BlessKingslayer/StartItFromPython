@@ -66,3 +66,6 @@
         * lambda **kwargs: 1；输入是任意键值对参数，输出是1
 
 7. Composite Pattern（组合模式）
+
+8. isinstance(object, 需要检测的类型)
+    * isinstance((x for x in range(10)), Iterable) => True 判断是不是迭代器
