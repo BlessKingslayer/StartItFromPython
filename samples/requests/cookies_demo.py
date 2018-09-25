@@ -1,4 +1,7 @@
 import requests
+import sys, io
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='gb18030') # windows下
 
 # r =requests.get('https://www.zhihu.com')
 # print(r.cookies)
