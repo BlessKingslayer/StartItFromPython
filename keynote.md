@@ -69,3 +69,7 @@
 
 8. isinstance(object, 需要检测的类型)
     * isinstance((x for x in range(10)), Iterable) => True 判断是不是迭代器
+
+9. 处理windows中print乱码或者gbk报错问题
+    * import sys, io
+    * sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='gb18030')
