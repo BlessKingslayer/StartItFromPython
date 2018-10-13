@@ -1,7 +1,13 @@
+import sys
+import os
+import time
 import re
 import urllib.parse
 import requests
+import csv
 from lxml import etree
+sys.path.append("G:\\EveryDayCode\\JustPython\\StartItFromPython\\utils")
+import CreateFile
 
 
 Headers = {
@@ -24,6 +30,9 @@ EnglishNumberDic = {
     'nine': '9',
     'dor': '.'
 }
+
+alldata = []
+flag = 0
 
 class HouseInfo(object):
     __slots__ = ('building_no', 'house_no', 'floor_area', 'inside_floor_area', 'efficiency',
@@ -103,14 +112,32 @@ def class_to_valstr(classvals):
     return res
 
 
+# 写入csv
+def write_to_csv(rows):
+    curtime = time.strftime("%Y%m%d_%H%M%S")
+    pathname = CreateFile.createFile('feilinshan_' + curtime + '.csv')
+    with open(pathname, 'w') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerows(rows)
+    return pathname
 
 # 获取房屋明细数据
 def get_house_detail(url):
     response = requests.get(url, headers=Headers)
     html = etree.HTML(response.content)
+    infos = []
+    global flag
+    if flag == 0:
+        info = html.xpath(
+            '//div[@class="onbuildshow"]/div[@class="onbuildshow_contant colordg ft14"]/table//td/text()'
+        )
+        infos.append(info)
+        flag = 1
+
     nodes = html.xpath(
-        '//div[@class="onbuildshow_contant colordg ft14" and position()=2]//tr[position()>1]'
+        '//div[@class="onbuildshow_contant colordg ft14" and position()=2]//tr[position()>=1]'
     )
+
     for node in nodes:
         info = []
         info.append(node.xpath('td[1]//a//text()')[0])
@@ -151,34 +178,41 @@ def get_house_detail(url):
         tmpnode = node.xpath('td[9]//a//text()')
         info.append(tmpnode[0] if len(tmpnode)>0 else '')
 
-        print(info)
+        infos.append(info)
+    return infos
 
 
 # 获取每幢楼的数据
 def get_house_data(url):
     pageurls = get_house_pageurl(url)
+    allresult = []
     for pageurl in pageurls:
-        get_house_detail(pageurl)
-    # print(pageurls)
+        allresult += get_house_detail(pageurl)
+    return allresult
 
 
 def main():
+    try:
+        mainUrl = get_url()
+        houseDict = get_house_nums()
+        # 将houseDict以value值排序, 即以楼号排序
+        houseItems = sorted(houseDict.items(), key=lambda x: int(x[1]), reverse=False)
 
-    mainUrl = get_url()
-    houseDict = get_house_nums()
-    # 将houseDict以value值排序, 即以楼号排序
-    houseItems = sorted(houseDict.items(), key=lambda x: int(x[1]), reverse=False)
+        originDict = split_urlparams(mainUrl)
+        targetUrls = []
 
-    originDict = split_urlparams(mainUrl)
-    targetUrls = []
+        for item in houseItems:
+            dic = {item[0].split('_')[0] + "id": item[0].split('_')[1]}
+            targetUrl = get_url(dic, originDict)
+            targetUrls.append(targetUrl)
 
-    for item in houseItems:
-        dic = {item[0].split('_')[0] + "id": item[0].split('_')[1]}
-        targetUrl = get_url(dic, originDict)
-        targetUrls.append(targetUrl)
-
-    for url in targetUrls:
-        get_house_data(url)
+        global alldata
+        for url in targetUrls:
+            alldata += get_house_data(url)
+        pathname = write_to_csv(alldata)
+        print('导出成功, 导出到', pathname)
+    except Exception as ex:
+        print('抓取失败: ', ex)
 
 
 if __name__ == '__main__':

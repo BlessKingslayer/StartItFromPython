@@ -11,7 +11,7 @@ def createLog():
 
 def createFile(filename, pathname=''):
     try:
-        default_path = os.path.abspath('../DataHub') \
+        default_path = os.path.abspath('G:\EveryDayCode\JustPython\StartItFromPython\DataHub') \
             if pathname.strip()=='' else os.path.abspath(pathname)
         path = default_path + '/' + filename
         if not os.path.exists(path):
@@ -21,4 +21,3 @@ def createFile(filename, pathname=''):
     except Exception as ex:
         print('utils -> create(filename, pathname) has errors. \n', ex)
         raise ex
-
