@@ -116,7 +116,7 @@ def class_to_valstr(classvals):
 def write_to_csv(rows):
     curtime = time.strftime("%Y%m%d_%H%M%S")
     pathname = CreateFile.createFile('feilinshan_' + curtime + '.csv')
-    with open(pathname, 'w') as csvfile:
+    with open(pathname, 'w', newline='') as csvfile: # newline='' 解决空行问题
         writer = csv.writer(csvfile)
         writer.writerows(rows)
     return pathname
@@ -134,9 +134,8 @@ def get_house_detail(url):
         infos.append(info)
         flag = 1
 
-    nodes = html.xpath(
-        '//div[@class="onbuildshow_contant colordg ft14" and position()=2]//tr[position()>=1]'
-    )
+    nodes = html.xpath('//div[@class="onbuildshow_contant colordg ft14"]')[1] \
+            .xpath('table/tbody/tr')
 
     for node in nodes:
         info = []
