@@ -5,7 +5,7 @@ import sys
 import io
 import re
 from fontTools.ttLib import TTFont
-sys.path.append("G:\\EveryDayCode\\JustPython\\StartItFromPython\\utils")
+sys.path.append("../../utils")
 import CreateFile
 import fontface
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='gb18030')
@@ -36,17 +36,36 @@ def create_ttf_xml(html):
 
     if dic['ttf'] == '':
         raise RuntimeError('字体文件不存在！')
+
     fonts = TTFont(dic['ttf'])
     uni_list = fonts.getGlyphOrder()[1:]
-    for uni in uni_list:
-        obj2 = fonts['glyf'][uni]
-        print(obj2)
+    print(uni_list)
+    print('-'*100)
+    # for uni in uni_list:
+    #     obj2 = fonts['glyf'][uni]
+    #     print(obj2)
+    numList = []
+    pathname = CreateFile.createFile('zt_base.ttf', 'DataHub/cv')
+    baseFonts = TTFont(pathname)
+    baseNumList = ['1', '0', '7', '9', '2', '8', '3', '5', '4', '6']
+    baseUniCode = ['uniE839', 'uniE852', 'uniE82D', 'uniE847', 'uniE83B', 'uniE83C', 'uniE829', 'uniE834', 'uniE82F', 'uniE84E']
+    for i in range(10):
+        onlineGlyph = fonts['glyf'][uni_list[i]]
+        for j in range(10):
+            baseGlyph = baseFonts['glyf'][baseUniCode[j]]
+            if onlineGlyph == baseGlyph:
+                numList.append(baseNumList[j])
+                break
+    print(numList)
+    #uni_list[1] = 'uni0078'
+    #utf8List = [eval("u'\u" + uni[3:] + "'").encode("utf-8") for uni in uni_list[1:]]
+    #print(utf8List)
 
 
 def get_main_list(url):
     html = get_xpath_obj(url)
     nodes = html.xpath('//div[@id="infolist"]/dl/dd/text()')
-    print(nodes)
+    # print(nodes)
     create_ttf_xml(html)
 
 

@@ -1,6 +1,8 @@
 import os, time
+import platform
 
-ProRootDir = 'G:\\EveryDayCode\\JustPython\\StartItFromPython\\'
+ProRootDir = 'G:\\EveryDayCode\\JustPython\\StartItFromPython\\' \
+                if platform.system() == 'Windows' else '/Users/wangjiawei/justpython/'
 # 创建日志文件
 def createLog():
     curtime = time.strftime("%Y%m%d_%H%M%S")
@@ -13,7 +15,7 @@ def createLog():
 def createFile(filename, pathname=''):
     global ProRootDir
     try:
-        default_path = os.path.abspath('G:\EveryDayCode\JustPython\StartItFromPython\DataHub') \
+        default_path = os.path.abspath(ProRootDir + 'DataHub') \
             if pathname.strip() == '' else os.path.abspath(ProRootDir + pathname)
         if pathname.strip() != '' and not os.path.exists(default_path):
             os.makedirs(default_path)

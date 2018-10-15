@@ -14,12 +14,12 @@ def createTtfAndXml(fontsstr):
         b = base64.b64decode(fontsstr)
         curtime = time.strftime("%Y%m%d_%H%M%S")
         pathnameTtf = CreateFile.createFile('zt_' + curtime + '.ttf',
-                                            'DataHub\\cv')
+                                            'DataHub/cv')
         with open(pathnameTtf, 'wb') as f:
             f.write(b)
 
         font = TTFont(pathnameTtf)
-        pathnameXml = CreateFile.createFile('zt_' + curtime + '.xml', 'DataHub\\cv')
+        pathnameXml = CreateFile.createFile('zt_' + curtime + '.xml', 'DataHub/cv')
         font.saveXML(pathnameXml)
         return {'ttf': pathnameTtf, 'xml': pathnameXml}
 
