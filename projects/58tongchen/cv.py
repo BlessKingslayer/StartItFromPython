@@ -41,22 +41,20 @@ def create_ttf_xml(html):
     uni_list = fonts.getGlyphOrder()[1:]
     print(uni_list)
     print('-'*100)
-    # for uni in uni_list:
-    #     obj2 = fonts['glyf'][uni]
-    #     print(obj2)
     numList = []
-    pathname = CreateFile.createFile('zt_base.ttf', 'DataHub/cv')
+    tmp = {}
+    pathname = CreateFile.createFile('msyh.ttf', 'DataHub/cv')
     baseFonts = TTFont(pathname)
     baseNumList = ['1', '0', '7', '9', '2', '8', '3', '5', '4', '6']
     baseUniCode = ['uniE839', 'uniE852', 'uniE82D', 'uniE847', 'uniE83B', 'uniE83C', 'uniE829', 'uniE834', 'uniE82F', 'uniE84E']
-    for i in range(10):
+    for i in range(len(uni_list)):
         onlineGlyph = fonts['glyf'][uni_list[i]]
         for j in range(10):
             baseGlyph = baseFonts['glyf'][baseUniCode[j]]
             if onlineGlyph == baseGlyph:
-                numList.append(baseNumList[j])
-                break
-    print(numList)
+                #numList.append(baseNumList[j])
+                tmp["&#x" + uni_list[i][3:].lower() + ';'] = baseNumList[j]
+    print(tmp)
     #uni_list[1] = 'uni0078'
     #utf8List = [eval("u'\u" + uni[3:] + "'").encode("utf-8") for uni in uni_list[1:]]
     #print(utf8List)

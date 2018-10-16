@@ -26,3 +26,9 @@ def createTtfAndXml(fontsstr):
     except Exception as ex:
         print('utils -> createTtfAndXml(fontsstr) has errors. \n', ex)
         return {'ttf': '', 'xml': ''}
+
+
+# pathnameTtf = CreateFile.createFile('zt_base.ttf', 'DataHub/cv')
+# font = TTFont(pathnameTtf)
+# pathnameXml = CreateFile.createFile('zt_base.xml', 'DataHub/cv')
+# font.saveXML(pathnameXml)
