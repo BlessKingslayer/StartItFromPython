@@ -5,8 +5,12 @@ import re
 import urllib.parse
 import requests
 import csv
+import platform
 from lxml import etree
-sys.path.append("G:\\EveryDayCode\\JustPython\\StartItFromPython\\utils")
+
+ProRootDir = 'G:\\EveryDayCode\\JustPython\\StartItFromPython\\' \
+                if platform.system() == 'Windows' else '/Users/wangjiawei/justpython/'
+sys.path.append(ProRootDir + "utils")
 import CreateFile
 
 

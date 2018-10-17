@@ -1,8 +1,12 @@
 import base64
 import sys
 import time
+import platform
 from fontTools.ttLib import TTFont
-sys.path.append("G:\\EveryDayCode\\JustPython\\StartItFromPython\\utils")
+
+ProRootDir = 'G:\\EveryDayCode\\JustPython\\StartItFromPython\\' \
+                if platform.system() == 'Windows' else '/Users/wangjiawei/justpython/'
+sys.path.append(ProRootDir + "utils")
 import CreateFile
 
 font_face = '''
@@ -28,7 +32,7 @@ def createTtfAndXml(fontsstr):
         return {'ttf': '', 'xml': ''}
 
 
-# pathnameTtf = CreateFile.createFile('zt_base.ttf', 'DataHub/cv')
+# pathnameTtf = CreateFile.createFile('msyh.ttf', 'DataHub/cv')
 # font = TTFont(pathnameTtf)
-# pathnameXml = CreateFile.createFile('zt_base.xml', 'DataHub/cv')
+# pathnameXml = CreateFile.createFile('msyh.xml', 'DataHub/cv')
 # font.saveXML(pathnameXml)

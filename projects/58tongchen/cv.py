@@ -4,8 +4,12 @@ import chardet
 import sys
 import io
 import re
+import platform
 from fontTools.ttLib import TTFont
-sys.path.append("../../utils")
+
+ProRootDir = 'G:\\EveryDayCode\\JustPython\\StartItFromPython\\' \
+                if platform.system() == 'Windows' else '/Users/wangjiawei/justpython/'
+sys.path.append(ProRootDir + "utils")
 import CreateFile
 import fontface
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='gb18030')
@@ -39,21 +43,25 @@ def create_ttf_xml(html):
 
     fonts = TTFont(dic['ttf'])
     uni_list = fonts.getGlyphOrder()[1:]
+
     print(uni_list)
     print('-'*100)
-    numList = []
     tmp = {}
+
     pathname = CreateFile.createFile('msyh.ttf', 'DataHub/cv')
     baseFonts = TTFont(pathname)
-    baseNumList = ['1', '0', '7', '9', '2', '8', '3', '5', '4', '6']
-    baseUniCode = ['uniE839', 'uniE852', 'uniE82D', 'uniE847', 'uniE83B', 'uniE83C', 'uniE829', 'uniE834', 'uniE82F', 'uniE84E']
+    base_uni_list = baseFonts.getGlyphOrder()[1:]
+    # baseNumList = ['1', '0', '7', '9', '2', '8', '3', '5', '4', '6']
+    # baseUniCode = ['uniE839', 'uniE852', 'uniE82D', 'uniE847', 'uniE83B', 'uniE83C', 'uniE829', 'uniE834', 'uniE82F', 'uniE84E']
     for i in range(len(uni_list)):
         onlineGlyph = fonts['glyf'][uni_list[i]]
-        for j in range(10):
-            baseGlyph = baseFonts['glyf'][baseUniCode[j]]
+        for j in range(len(base_uni_list)):
+            baseGlyph = baseFonts['glyf'][base_uni_list[j]]
             if onlineGlyph == baseGlyph:
+                print(uni_list[i].lower(), "---", base_uni_list[j].lower())
                 #numList.append(baseNumList[j])
-                tmp["&#x" + uni_list[i][3:].lower() + ';'] = baseNumList[j]
+                #tmp["&#x" + uni_list[i][3:].lower() +';'] = base_uni_list[j][3:].lower()
+                tmp[uni_list[i].lower()] = base_uni_list[j].lower()
     print(tmp)
     #uni_list[1] = 'uni0078'
     #utf8List = [eval("u'\u" + uni[3:] + "'").encode("utf-8") for uni in uni_list[1:]]
