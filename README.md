@@ -8,3 +8,5 @@ vscode: 折叠所有代码 : ctrl + k  ctrl + 0(零)
         展开....... : ctrl + k ctrl + j
 
 pip install python3-memcached
+
+https://pymemcache.readthedocs.io/en/latest/getting_started.html#serialization

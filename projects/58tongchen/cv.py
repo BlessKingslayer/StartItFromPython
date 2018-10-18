@@ -6,9 +6,12 @@ import io
 import re
 import platform
 import os
-import memcache
-import json
+# import memcache
+import pickle
 from fontTools.ttLib import TTFont
+from pymemcache.client.base import Client
+from pymemcache import serde
+
 
 ProRootDir = 'G:\\EveryDayCode\\JustPython\\StartItFromPython\\' \
                 if platform.system() == 'Windows' else '/Users/wangjiawei/justpython/'
@@ -51,25 +54,36 @@ def get_base_fonts():
     # def json_serializer(key, value):
     #     if type(value) == str:
     #         return value, 1
-    #     return json.dumps(value), 2
+    #     return pickle.dumps(value), 2
 
-    # def json2_deserializer(key, value, flags):
+    # def json_deserializer(key, value, flags):
     #     if flags == 1:
     #         return value
     #     if flags == 2:
-    #         raiseException("Unknown serialization format")
-    #         return json.loads(value)
+    #         return pickle.loads(value)
+    #     raiseException("Unknown serialization format")
+        
 
-    mc = memcache.Client(['127.0.0.1:11211'], debug=1)
+    mc = Client(('127.0.0.1', 11211),
+        serializer=serde.python_memcache_serializer,
+        deserializer=serde.python_memcache_deserializer
+        # serializer=serde.get_python_memcache_serializer(pickle_version=2),
+        # deserializer=serde.python_memcache_deserializer
+        )
+        
     ret1 = mc.get('baseFonts')
     ret2 = mc.get('base_uni_list')
     if ret1 is None or ret2 is None:
+        print('dododododo')
         pathname = CreateFile.createFile('msyh.ttf', 'DataHub/cv')
         baseFonts = TTFont(pathname)
         base_uni_list = baseFonts.getGlyphOrder()[1:]
-        mc.set('baseFonts', json.dumps(baseFonts, default=lambda obj: obj.__dict__, sort_keys=True, indent=4))
-        mc.set('base_uni_list', json.dumps(base_uni_list))
-    return [json.loads(ret1), json.loads(ret2)]
+        print(baseFonts['glyf'])
+        mc.set('baseFonts', baseFonts['glyf'])
+        mc.set('base_uni_list', base_uni_list)
+        ret1 = mc.get('baseFonts')
+        ret2 = mc.get('base_uni_list')
+    return [ret1, ret2]
 
 
 # 生成字体文件
@@ -107,14 +121,15 @@ def create_ttf_xml(html):
 
 
 def get_main_list(url):
-    html = get_xpath_obj(url)
-    nodes = html.xpath('//div[@id="infolist"]/dl/dd/text()')
-    print(nodes)
-    print('*' * 100)
-    get_base_fonts()
-    fontDic = create_ttf_xml(html)
-    print('*' * 100)
-    print(fontDic)
+    # html = get_xpath_obj(url)
+    # nodes = html.xpath('//div[@id="infolist"]/dl/dd/text()')
+    # print(nodes)
+    # print('*' * 100)
+    basefonts = get_base_fonts()
+    # print(basefonts)
+    # fontDic = create_ttf_xml(html)
+    # print('*' * 100)
+    # print(fontDic)
 
 def main():
     global MainUrl
