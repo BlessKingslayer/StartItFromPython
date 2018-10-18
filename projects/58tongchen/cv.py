@@ -5,6 +5,9 @@ import sys
 import io
 import re
 import platform
+import os
+import memcache
+import json
 from fontTools.ttLib import TTFont
 
 ProRootDir = 'G:\\EveryDayCode\\JustPython\\StartItFromPython\\' \
@@ -30,50 +33,88 @@ def get_xpath_obj(url):
     html = etree.HTML(response.content)
     return html
 
-# 生成字体文件xml
+
+# 简单比较两个字体
+def cmp_font_glyph(a, b):
+    try:
+        if a.coordinates == b.coordinates and a.endPtsOfContours == b.endPtsOfContours \
+            and a.flags == b.flags and a.xMax == b.xMax and a.xMin == b.xMin \
+            and a.yMax == b.yMax and a.yMin == b.yMin:
+            return True
+    except:
+        pass
+    return False
+
+
+# 获取本地字体库数据
+def get_base_fonts():
+    # def json_serializer(key, value):
+    #     if type(value) == str:
+    #         return value, 1
+    #     return json.dumps(value), 2
+
+    # def json2_deserializer(key, value, flags):
+    #     if flags == 1:
+    #         return value
+    #     if flags == 2:
+    #         raiseException("Unknown serialization format")
+    #         return json.loads(value)
+
+    mc = memcache.Client(['127.0.0.1:11211'], debug=1)
+    ret1 = mc.get('baseFonts')
+    ret2 = mc.get('base_uni_list')
+    if ret1 is None or ret2 is None:
+        pathname = CreateFile.createFile('msyh.ttf', 'DataHub/cv')
+        baseFonts = TTFont(pathname)
+        base_uni_list = baseFonts.getGlyphOrder()[1:]
+        mc.set('baseFonts', json.dumps(baseFonts, default=lambda obj: obj.__dict__, sort_keys=True, indent=4))
+        mc.set('base_uni_list', json.dumps(base_uni_list))
+    return [json.loads(ret1), json.loads(ret2)]
+
+
+# 生成字体文件
 def create_ttf_xml(html):
+    tmp = {}
     fontstr = html.xpath('//style[1]/text()')[0]
     pattern = re.compile('^.*?base64,(.*?)\).*?format', re.S)
     result = re.match(pattern, fontstr)
     str = result.group(1)
-    dic = fontface.createTtfAndXml(str)
-
+    dic = fontface.createTtfAndXml(str, False)
     if dic['ttf'] == '':
         raise RuntimeError('字体文件不存在！')
-
     fonts = TTFont(dic['ttf'])
     uni_list = fonts.getGlyphOrder()[1:]
-
-    print(uni_list)
-    print('-'*100)
-    tmp = {}
-
-    pathname = CreateFile.createFile('msyh.ttf', 'DataHub/cv')
-    baseFonts = TTFont(pathname)
-    base_uni_list = baseFonts.getGlyphOrder()[1:]
-    # baseNumList = ['1', '0', '7', '9', '2', '8', '3', '5', '4', '6']
-    # baseUniCode = ['uniE839', 'uniE852', 'uniE82D', 'uniE847', 'uniE83B', 'uniE83C', 'uniE829', 'uniE834', 'uniE82F', 'uniE84E']
-    for i in range(len(uni_list)):
-        onlineGlyph = fonts['glyf'][uni_list[i]]
-        for j in range(len(base_uni_list)):
-            baseGlyph = baseFonts['glyf'][base_uni_list[j]]
-            if onlineGlyph == baseGlyph:
-                print(uni_list[i].lower(), "---", base_uni_list[j].lower())
-                #numList.append(baseNumList[j])
-                #tmp["&#x" + uni_list[i][3:].lower() +';'] = base_uni_list[j][3:].lower()
-                tmp[uni_list[i].lower()] = base_uni_list[j].lower()
-    print(tmp)
-    #uni_list[1] = 'uni0078'
-    #utf8List = [eval("u'\u" + uni[3:] + "'").encode("utf-8") for uni in uni_list[1:]]
-    #print(utf8List)
+    baseRet = get_base_fonts()
+    baseFonts = baseRet[0]
+    base_uni_list = baseRet[1]
+    for i in uni_list:
+        onlineGlyph = fonts['glyf'][i]
+        for j in base_uni_list:
+            baseGlyph = baseFonts['glyf'][j]
+            if cmp_font_glyph(onlineGlyph, baseGlyph):
+                try:
+                    unistr = '\\u' + j[3:7].lower()
+                    realstr = unistr.encode('utf-8').decode('unicode_escape')
+                    tmp[i.lower()] = realstr
+                    #print(i.lower(), "---", j.lower(), "---", realstr)
+                except:
+                    tmp[i.lower()] = j.lower()
+                    #print(i.lower(), "---", j.lower())
+                break
+    if os.path.exists(dic['ttf']):
+        os.remove(dic['ttf'])
+    return tmp
 
 
 def get_main_list(url):
     html = get_xpath_obj(url)
     nodes = html.xpath('//div[@id="infolist"]/dl/dd/text()')
-    # print(nodes)
-    create_ttf_xml(html)
-
+    print(nodes)
+    print('*' * 100)
+    get_base_fonts()
+    fontDic = create_ttf_xml(html)
+    print('*' * 100)
+    print(fontDic)
 
 def main():
     global MainUrl
