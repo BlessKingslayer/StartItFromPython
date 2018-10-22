@@ -73,3 +73,5 @@
 9. 处理windows中print乱码或者gbk报错问题
     * import sys, io
     * sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='gb18030')
+
+10. python -u xxx.py 禁用stdout缓冲

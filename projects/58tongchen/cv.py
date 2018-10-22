@@ -11,14 +11,16 @@ import pickle
 from fontTools.ttLib import TTFont
 from pymemcache.client.base import Client
 from pymemcache import serde
-
+import time
+import threading
+import threadpool
 
 ProRootDir = 'G:\\EveryDayCode\\JustPython\\StartItFromPython\\' \
                 if platform.system() == 'Windows' else '/Users/wangjiawei/justpython/'
 sys.path.append(ProRootDir + "utils")
 import CreateFile
 import fontface
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='gb18030')
+# sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='gb18030')
 
 
 Headers = {
@@ -29,6 +31,7 @@ Headers = {
 }
 MainUrl = 'https://hz.58.com/qzitjishuweihu/?PGTID=0d303349-0004-ffe2-1a2c-3cf60cddc6aa&ClickID=2'
 
+
 def get_xpath_obj(url):
     global Headers
     response = requests.get(url, headers=Headers)
@@ -37,53 +40,47 @@ def get_xpath_obj(url):
     return html
 
 
+loop = 0
+starttime = time.time();
+
 # 简单比较两个字体
 def cmp_font_glyph(a, b):
+    global loop
+    loop += 1
+    print('start: ',loop)
     try:
         if a.coordinates == b.coordinates and a.endPtsOfContours == b.endPtsOfContours \
             and a.flags == b.flags and a.xMax == b.xMax and a.xMin == b.xMin \
             and a.yMax == b.yMax and a.yMin == b.yMin:
             return True
+        print('end:',loop)
     except:
+        print('end:', loop)
         pass
     return False
 
 
 # 获取本地字体库数据
 def get_base_fonts():
-    # def json_serializer(key, value):
-    #     if type(value) == str:
-    #         return value, 1
-    #     return pickle.dumps(value), 2
+    pathname = CreateFile.createFile('msyh.ttf', 'DataHub/cv')
+    baseFonts = TTFont(pathname)
+    base_uni_list = baseFonts.getGlyphOrder()[1:]
+    return [baseFonts, base_uni_list]
 
-    # def json_deserializer(key, value, flags):
-    #     if flags == 1:
-    #         return value
-    #     if flags == 2:
-    #         return pickle.loads(value)
-    #     raiseException("Unknown serialization format")
-        
 
-    mc = Client(('127.0.0.1', 11211),
-        serializer=serde.python_memcache_serializer,
-        deserializer=serde.python_memcache_deserializer
-        # serializer=serde.get_python_memcache_serializer(pickle_version=2),
-        # deserializer=serde.python_memcache_deserializer
-        )
-        
-    ret1 = mc.get('baseFonts')
-    ret2 = mc.get('base_uni_list')
-    if ret1 is None or ret2 is None:
-        print('dododododo')
-        pathname = CreateFile.createFile('msyh.ttf', 'DataHub/cv')
-        baseFonts = TTFont(pathname)
-        base_uni_list = baseFonts.getGlyphOrder()[1:]
-        print(baseFonts['glyf'])
-        mc.set('baseFonts', baseFonts['glyf'])
-        mc.set('base_uni_list', base_uni_list)
-        ret1 = mc.get('baseFonts')
-        ret2 = mc.get('base_uni_list')
-    return [ret1, ret2]
+# 在basefonts中寻找匹配字体
+def search_match_font(i, curfont, baseFonts, base_uni_list, tmp):
+    for j in base_uni_list:
+        baseGlyph = baseFonts['glyf'][j]
+        if cmp_font_glyph(curfont, baseGlyph):
+            try:
+                unistr = '\\u' + j[3:7].lower()
+                realstr = unistr.encode('utf-8').decode('unicode_escape')
+                tmp[i.lower()] = realstr
+            except:
+                tmp[i.lower()] = j.lower()
+            finally:
+                break
 
 
 # 生成字体文件
@@ -103,37 +100,29 @@ def create_ttf_xml(html):
     base_uni_list = baseRet[1]
     for i in uni_list:
         onlineGlyph = fonts['glyf'][i]
-        for j in base_uni_list:
-            baseGlyph = baseFonts['glyf'][j]
-            if cmp_font_glyph(onlineGlyph, baseGlyph):
-                try:
-                    unistr = '\\u' + j[3:7].lower()
-                    realstr = unistr.encode('utf-8').decode('unicode_escape')
-                    tmp[i.lower()] = realstr
-                    #print(i.lower(), "---", j.lower(), "---", realstr)
-                except:
-                    tmp[i.lower()] = j.lower()
-                    #print(i.lower(), "---", j.lower())
-                break
+        search_match_font(i, onlineGlyph, baseFonts, base_uni_list, tmp)
+        # task_pool = threadpool.ThreadPool(50)
+        # func_var = [([i, onlineGlyph, baseFonts, base_uni_list, tmp], None)]
+        # pools = threadpool.makeRequests(search_match_font, func_var)
+        # for pool in pools:
+        #     task_pool.putRequest(pool)
+        # task_pool.wait()
+
     if os.path.exists(dic['ttf']):
         os.remove(dic['ttf'])
     return tmp
 
 
 def get_main_list(url):
-    # html = get_xpath_obj(url)
-    # nodes = html.xpath('//div[@id="infolist"]/dl/dd/text()')
-    # print(nodes)
-    # print('*' * 100)
-    basefonts = get_base_fonts()
-    # print(basefonts)
-    # fontDic = create_ttf_xml(html)
-    # print('*' * 100)
-    # print(fontDic)
+    html = get_xpath_obj(url)
+    nodes = html.xpath('//div[@id="infolist"]/dl/dd/text()')
+    fontDic = create_ttf_xml(html)
+    print(fontDic)
 
 def main():
-    global MainUrl
+    global MainUrl, starttime
     get_main_list(MainUrl)
+    print(time.time() - starttime)
 
 if __name__ == '__main__':
     main()
