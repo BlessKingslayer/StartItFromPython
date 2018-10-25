@@ -10,3 +10,6 @@ vscode: 折叠所有代码 : ctrl + k  ctrl + 0(零)
 pip install python3-memcached
 
 https://pymemcache.readthedocs.io/en/latest/getting_started.html#serialization
+
+cd E:\software64\Memcached\memcached-1.4.5-amd64\memcached-amd64
+启动 -d start
