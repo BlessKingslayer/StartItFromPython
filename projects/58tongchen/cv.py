@@ -6,7 +6,7 @@ import io
 import re
 import platform
 import os
-# import memcache
+import memcache
 import pickle
 from fontTools.ttLib import TTFont
 from pymemcache.client.base import Client
@@ -14,6 +14,8 @@ from pymemcache import serde
 import time
 import threading
 import threadpool
+import hashlib
+import json
 
 ProRootDir = 'G:\\EveryDayCode\\JustPython\\StartItFromPython\\' \
                 if platform.system() == 'Windows' else '/Users/wangjiawei/justpython/'
@@ -83,6 +85,17 @@ def search_match_font(i, curfont, baseFonts, base_uni_list, tmp):
                 break
 
 
+def create_new_obj(baseGlyph):
+    try:
+        newobjstr = str(baseGlyph.coordinates.array.tolist()) + \
+            str(baseGlyph.coordinates._a.tolist()) + \
+            str(baseGlyph.endPtsOfContours) + \
+            str(baseGlyph.flags.tolist()) + str(baseGlyph.xMax) + str(baseGlyph.xMin) + str(baseGlyph.yMax) + str(baseGlyph.yMin)
+    except:
+        newobjstr = ''
+    return newobjstr
+
+
 # 生成字体文件
 def create_ttf_xml(html):
     tmp = {}
@@ -98,9 +111,21 @@ def create_ttf_xml(html):
     baseRet = get_base_fonts()
     baseFonts = baseRet[0]
     base_uni_list = baseRet[1]
+
+    mc = memcache.Client(['127.0.0.1:11211'], debug=1)
+    ret = mc.get('basefonts')
+    basedir = json.loads(ret)
     for i in uni_list:
         onlineGlyph = fonts['glyf'][i]
-        search_match_font(i, onlineGlyph, baseFonts, base_uni_list, tmp)
+        newobjstr = create_new_obj(onlineGlyph)
+        if newobjstr == '':
+            continue
+        hashstr = hashlib.md5(newobjstr.encode("utf-8")).hexdigest()
+        try:
+            tmp[i.lower()] = basedir[hashstr]
+        except:
+            tmp[i.lower()] = "unknown code"
+        # search_match_font(i, onlineGlyph, baseFonts, base_uni_list, tmp)
         # task_pool = threadpool.ThreadPool(50)
         # func_var = [([i, onlineGlyph, baseFonts, base_uni_list, tmp], None)]
         # pools = threadpool.makeRequests(search_match_font, func_var)

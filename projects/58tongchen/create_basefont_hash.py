@@ -2,6 +2,8 @@ import sys
 import platform
 import hashlib
 import io
+import memcache
+import json
 from copy import deepcopy
 from fontTools.ttLib import TTFont
 
@@ -40,7 +42,7 @@ def main():
         newobjstr = create_new_obj(baseGlyph)
         if newobjstr == '':
             continue
-        hashstr = hash(newobjstr)
+        hashstr = hashlib.md5(newobjstr.encode("utf-8")).hexdigest()
         try:
             unistr = '\\u' + i[3:7].lower()
             realstr = unistr.encode('utf-8').decode('unicode_escape')
@@ -48,7 +50,19 @@ def main():
         except:
             result[hashstr] = i.lower()
 
-    print(result)
+    mc = memcache.Client(['127.0.0.1:11211'], debug=1)
+    # ret = mc.get('basefonts')
+    # if ret is None:
+    # mc.delete('basefonts')
+    try:
+        res = json.dumps(result)
+        print(sys.getsizeof(res))
+        r = mc.set('basefonts', res)
+        print("return:", r)
+    except:
+        print('somethingwrong')
+
+    # print(result)
 
 
 if __name__ == '__main__':
