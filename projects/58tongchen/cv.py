@@ -16,6 +16,7 @@ import threading
 import threadpool
 import hashlib
 import json
+from redis import StrictRedis
 
 ProRootDir = 'G:\\EveryDayCode\\JustPython\\StartItFromPython\\' \
                 if platform.system() == 'Windows' else '/Users/wangjiawei/justpython/'
@@ -37,8 +38,14 @@ MainUrl = 'https://hz.58.com/qzitjishuweihu/?PGTID=0d303349-0004-ffe2-1a2c-3cf60
 def get_xpath_obj(url):
     global Headers
     response = requests.get(url, headers=Headers)
+
+    # curtime = time.strftime("%Y%m%d_%H%M%S")
+    # pathname = CreateFile.createFile('page_' + curtime + '.html', 'DataHub/allhtml')
+    # with open(pathname, 'w') as f:
+    #     f.write(response.text)
     print(chardet.detect(response.content))
     html = etree.HTML(response.content)
+
     return html
 
 
@@ -108,13 +115,8 @@ def create_ttf_xml(html):
         raise RuntimeError('字体文件不存在！')
     fonts = TTFont(dic['ttf'])
     uni_list = fonts.getGlyphOrder()[1:]
-    baseRet = get_base_fonts()
-    baseFonts = baseRet[0]
-    base_uni_list = baseRet[1]
+    redis = StrictRedis(host='localhost', port=6379, db=1)
 
-    mc = memcache.Client(['127.0.0.1:11211'], debug=1)
-    ret = mc.get('basefonts')
-    basedir = json.loads(ret)
     for i in uni_list:
         onlineGlyph = fonts['glyf'][i]
         newobjstr = create_new_obj(onlineGlyph)
@@ -122,19 +124,13 @@ def create_ttf_xml(html):
             continue
         hashstr = hashlib.md5(newobjstr.encode("utf-8")).hexdigest()
         try:
-            tmp[i.lower()] = basedir[hashstr]
-        except:
+            tmp[i.lower()] = redis.get(hashstr).decode('utf-8')
+        except Exception as ex:
+            # print(ex)
             tmp[i.lower()] = "unknown code"
-        # search_match_font(i, onlineGlyph, baseFonts, base_uni_list, tmp)
-        # task_pool = threadpool.ThreadPool(50)
-        # func_var = [([i, onlineGlyph, baseFonts, base_uni_list, tmp], None)]
-        # pools = threadpool.makeRequests(search_match_font, func_var)
-        # for pool in pools:
-        #     task_pool.putRequest(pool)
-        # task_pool.wait()
 
-    if os.path.exists(dic['ttf']):
-        os.remove(dic['ttf'])
+    # if os.path.exists(dic['ttf']):
+    #     os.remove(dic['ttf'])
     return tmp
 
 

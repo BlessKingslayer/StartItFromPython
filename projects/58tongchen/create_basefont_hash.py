@@ -6,6 +6,7 @@ import memcache
 import json
 from copy import deepcopy
 from fontTools.ttLib import TTFont
+from redis import StrictRedis
 
 ProRootDir = 'G:\\EveryDayCode\\JustPython\\StartItFromPython\\' \
                 if platform.system() == 'Windows' else '/Users/wangjiawei/justpython/'
@@ -37,6 +38,7 @@ def main():
     baseFonts = baseRet[0]
     base_uni_list = baseRet[1]
     result = {}
+    redis = StrictRedis(host='localhost', port=6379, db=1)
     for i in base_uni_list:
         baseGlyph = baseFonts['glyf'][i]
         newobjstr = create_new_obj(baseGlyph)
@@ -49,20 +51,21 @@ def main():
             result[hashstr] = realstr
         except:
             result[hashstr] = i.lower()
+        redis.set(hashstr, result[hashstr])
 
-    mc = memcache.Client(['127.0.0.1:11211'], debug=1)
+    # mc = memcache.Client(['127.0.0.1:11211'], debug=1)
     # ret = mc.get('basefonts')
     # if ret is None:
     # mc.delete('basefonts')
-    try:
-        res = json.dumps(result)
-        print(sys.getsizeof(res))
-        r = mc.set('basefonts', res)
-        print("return:", r)
-    except:
-        print('somethingwrong')
+    # try:
+    #     res = json.dumps(result)
+    #     print(sys.getsizeof(res))
+    #     r = mc.set('basefonts', res)
+    #     print("return:", r)
+    # except:
+    #     print('somethingwrong')
 
-    # print(result)
+    print('Ending.........')
 
 
 if __name__ == '__main__':
