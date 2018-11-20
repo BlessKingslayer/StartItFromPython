@@ -77,3 +77,7 @@
 10. python -u xxx.py 禁用stdout缓冲
 
 11. redis 
+
+12. django
+    * windows下使用cli创建django项目，执行时脚本名不带.py  django-admin
+    * path 不支持正则表达式， 需要使用re_path

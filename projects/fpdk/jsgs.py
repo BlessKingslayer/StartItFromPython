@@ -1,4 +1,36 @@
 import requests
+import sys, io
+import time
+import platform
+ProRootDir = 'G:\\EveryDayCode\\JustPython\\StartItFromPython\\' \
+                if platform.system() == 'Windows' else '/Users/wangjiawei/justpython/'
+sys.path.append(ProRootDir + "utils")
+import CreateFile
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='gb18030')
+
+def login():
+    headers = {
+        'User-Agent':
+        'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko',
+        'Referer':
+        'https://fpdk.jsgs.gov.cn:81/main.9a77879c.html',
+        'Host':
+        'fpdk.jsgs.gov.cn:81',
+        'Cookie':
+        'yfx_c_g_u_id_10003709=_ck18011615030710075726531379081; yfx_f_l_v_t_10003709=f_t_1516086186891__r_t_1534236410623__v_t_1534236410623__r_c_34; dzdzsl=20111189; dqrq=2018-11-11; nsrmc=%u6C5F%u82CF%u5357%u901A%u516D%u5EFA%u5EFA%u8BBE%u96C6%u56E2%u6709%u9650%u516C%u53F8; skssq=201810;20181115;201810; gxrqfw=20171006-20181031; token=1~0~0~~1~0~0~0~0~0~aea27f34-b4fc-4c32-a1f7-afb0c08eab3e'
+    }
+    url = 'https://fpdk.jsgs.gov.cn:81/fphx.b42f42fd.html'
+    s = requests.Session()
+    response = s.get(url, headers=headers, verify=False)
+    print('login: ', response.status_code)
+    # curtime = time.strftime("%Y%m%d_%H%M%S")
+    # pathname = CreateFile.createFile('page_' + curtime + '.html', 'DataHub/fpdkhtml')
+    # with open(pathname, 'w', encoding='utf-8') as f:
+    #     f.write(response.text)
+    # print(response.text)
+
+
+login()
 
 Headers = {
     'User-Agent':
@@ -8,7 +40,7 @@ Headers = {
     'Host':
     'fpdk.jsgs.gov.cn:81',
     'Cookie':
-    'dzdzsl=20111189; dqrq=2018-10-29; nsrmc=%u6C5F%u82CF%u5357%u901A%u516D%u5EFA%u5EFA%u8BBE%u96C6%u56E2%u6709%u9650%u516C%u53F8; skssq=201810%3B20181115%3B201810; gxrqfw=20171006-20181031; token=1%7E0%7E0%7E%7E1%7E0%7E0%7E0%7E0%7E0%7Eaea27f34-b4fc-4c32-a1f7-afb0c08eab3e; yfx_c_g_u_id_10003709=_ck18011615030710075726531379081; yfx_f_l_v_t_10003709=f_t_1516086186891__r_t_1534236410623__v_t_1534236410623__r_c_34',
+    'dzdzsl=20111189; dqrq=2018-11-11; nsrmc=%u6C5F%u82CF%u5357%u901A%u516D%u5EFA%u5EFA%u8BBE%u96C6%u56E2%u6709%u9650%u516C%u53F8; skssq=201810;20181115;201810; gxrqfw=20171006-20181031; token=1~0~0~~1~0~0~0~0~0~aea27f34-b4fc-4c32-a1f7-afb0c08eab3e; yfx_c_g_u_id_10003709=_ck18011615030710075726531379081; yfx_f_l_v_t_10003709=f_t_1516086186891__r_t_1534236410623__v_t_1534236410623__r_c_34',
     'Remote Address':
     'fpdk.jsgs.gov.cn/221.226.83.22:81'
 }
@@ -47,11 +79,11 @@ data = {
     # 'ba0698460c6fd3e901e0198a1952573d'
     'ba0698460c6fd3e901e0198a1952573d'
 }
-response = requests.get(
+response = requests.post(
     url,
     headers=Headers,
-    params=data,
-    # data=data,
+    # params=data,
+    data=data,
     verify=False
     # 'G:\\EveryDayCode\\JustPython\\StartItFromPython\\projects\\fpdk\\target.pem'
 )
