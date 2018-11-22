@@ -1,1 +1,4 @@
 .vscode/
+WebProject/rango/rango/__pycache__/
+WebProject/rango/rangoapp/__pycache__/
+WebProject/rango/rangoapp/migrations/
