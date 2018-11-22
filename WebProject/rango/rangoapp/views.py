@@ -10,6 +10,9 @@ def index(request):
 
 
 def page(request):
-    return HttpResponse(
-        'Rango Says: Here is the about page. <a href="/rangoapp/">back to main</a>'
-    )
+    context = RequestContext(request)
+    return render_to_response('rangoapp/about.html', None, context)
+
+    # return HttpResponse(
+    #     'Rango Says: Here is the about page. <a href="/rangoapp/">back to main</a>'
+    # )

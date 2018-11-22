@@ -81,3 +81,9 @@
 12. django
     * windows下使用cli创建django项目，执行时脚本名不带.py  django-admin
     * path 不支持正则表达式， 需要使用re_path
+    * 创建和同步数据库:         
+        * python manage.py makemigrations rangoapp  #用来检测数据库变更和生成数据库迁移文件
+        * python manage.py migrate          #用来迁移数据库
+        * python manage.py sqlmigrate rangoapp 0001 # 用来把数据库迁移文件转换成数据库语言(最后一个参数是migration_name)
+        * python manage.py createsuperuser  #创建初始的超级用户
+        * python manage.py shell            # 进入shell模式
