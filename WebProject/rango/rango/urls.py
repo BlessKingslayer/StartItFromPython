@@ -23,7 +23,8 @@ admin.autodiscover()
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('rangoapp/', include('rangoapp.urls'))
+    path('rangoapp/', include('rangoapp.urls')),
+    path('', include('rangoapp.urls'))
 ]
 
 if settings.DEBUG:
