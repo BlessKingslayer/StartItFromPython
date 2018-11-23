@@ -87,3 +87,14 @@
         * python manage.py sqlmigrate rangoapp 0001 # 用来把数据库迁移文件转换成数据库语言(最后一个参数是migration_name)
         * python manage.py createsuperuser  #创建初始的超级用户
         * python manage.py shell            # 进入shell模式
+    * 添加一个Model的步骤:
+        1. 在你的application中的models.py文件中创建你要添加的model(s)
+        2. 如果你要使用你新加的model(s)，你需要在admin.py(admin interface)中include你的model(s)
+        3. 需要同步你的数据库————使用上面一条要点中的命令
+        4. 为你新增的model(s)创建或修改你的population script，并生成新的模拟数据
+    * 数据驱动页面 基本流程:
+        1. 在你应用的views.py中导入你需要使用的model
+        2. 在页面内查询model去获取需要展示的数据
+        3. 传送结果给模板上下文
+        4. 设置模板去展示数据
+        5. 配置一个URL指向view

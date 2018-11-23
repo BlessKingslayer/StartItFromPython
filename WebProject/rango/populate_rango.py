@@ -1,4 +1,5 @@
 import os
+import django
 
 def populate():
     python_cat = add_cat('Python')
@@ -50,12 +51,27 @@ def add_page(cat, title, url, views=0):
 
 
 def add_cat(name):
-    c = Category.objects.get_or_create(name=name)[0]
+    views = 0
+    likes = 0
+    if (name == 'Python'):
+        views = 128
+        likes = 64
+    elif (name == 'Django'):
+        views = 64
+        likes = 32
+    elif (name == 'Other Frameworks'):
+        views = 32
+        likes = 16
+    c = Category.objects.get_or_create(name=name, views=views, likes=likes)[0]
     return c
 
 
 if __name__ == "__main__":
     print('Starting Rangoapp population script...')
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'rango.settings')
+    django.setup()  # 这一步很关键
+
     from rangoapp.models import Category, Page
+    # Page.objects.all().delete()
+    # Category.objects.all().delete()
     populate()
