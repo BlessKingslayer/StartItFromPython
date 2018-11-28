@@ -2,6 +2,7 @@ from django.shortcuts import render, render_to_response
 from django.http import HttpResponse
 from django.template import RequestContext
 from rangoapp.models import Category, Page
+from rangoapp.form import CategoryForm
 
 
 def index(request):
@@ -10,7 +11,11 @@ def index(request):
     category_list = Category.objects.order_by('-likes')[:5]  # 加-符号: 倒序
     page_list = Page.objects.order_by('-views')[:5]
 
-    context_dict = {'categories': category_list, 'pages': page_list}
+    context_dict = {
+        'categories': category_list,
+        'pages': page_list
+    }
+
     for category in category_list:
         category.url = category.name.replace(' ', '_')
     return render_to_response('rangoapp/index.html', context_dict, context)
@@ -38,3 +43,22 @@ def category(request, category_name_url):
         pass
 
     return render_to_response('rangoapp/category.html', context_dict, context)
+
+
+def add_category(request):
+    context = RequestContext(request)
+
+    if request.method == 'POST':
+        # request.POST: A dictionary-like object containing all given HTTP POST parameters, 
+        #               providing that the request contains form data
+        form = CategoryForm(request.POST)
+
+        if form.is_valid():
+            form.save(commit=True)
+            return index(request)
+        else:
+            print(form.errors)
+    else:
+        form = CategoryForm()
+
+    return render_to_response('rangoapp/add_category.html', {'form': form}, context)

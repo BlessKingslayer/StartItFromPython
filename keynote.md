@@ -98,3 +98,16 @@
         3. 传送结果给模板上下文
         4. 设置模板去展示数据
         5. 配置一个URL指向view
+    * 使用simple_tag注册模板自定义函数
+        1. app目录下创建templatetag目录，必须配置__init__.py来标记为是一个python包
+        2. 目录下创建文件xxx.py，在模板文件中导入 {% load xxx %}
+        3. xxx.py 中注册自定义函数
+            ```python
+            from django import template
+            register = template.Library()
+
+            @register.simple_tag()
+            def func_name1(arg1, arg2):
+                return 'result'
+            ```
+        4. 模板文件中使用自定义函数 {% func_name1 arg1 arg2 %}
