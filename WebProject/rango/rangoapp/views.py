@@ -2,7 +2,7 @@ from django.shortcuts import render, render_to_response
 from django.http import HttpResponse
 from django.template import RequestContext
 from rangoapp.models import Category, Page
-from rangoapp.form import CategoryForm
+from rangoapp.form import CategoryForm, PageForm
 
 
 def index(request):
@@ -49,7 +49,7 @@ def add_category(request):
     context = RequestContext(request)
 
     if request.method == 'POST':
-        # request.POST: A dictionary-like object containing all given HTTP POST parameters, 
+        # request.POST: A dictionary-like object containing all given HTTP POST parameters,
         #               providing that the request contains form data
         form = CategoryForm(request.POST)
 
@@ -61,4 +61,13 @@ def add_category(request):
     else:
         form = CategoryForm()
 
-    return render_to_response('rangoapp/add_category.html', {'form': form}, context)
+    return render(request, 'rangoapp/add_category.html', {'form': form}, context)
+
+
+def add_page(request):
+    context = RequestContext(request)
+
+    if request.method == 'POST':
+        
+
+

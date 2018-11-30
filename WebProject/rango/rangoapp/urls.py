@@ -7,8 +7,8 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('about/', views.page, name='page'),
     url(r'^add_category/$', views.add_category, name='add_category'),
-    re_path(
-        r'^category/(?P<category_name_url>\w+)/$',
+    url(
+        r'^category/(?P<category_name_url>\w+)$',
         views.category,
         name='category')
 ]
