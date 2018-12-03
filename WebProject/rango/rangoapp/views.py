@@ -39,6 +39,7 @@ def category(request, category_name_url):
         pages = Page.objects.filter(category=category)
         context_dict['pages'] = pages
         context_dict['category'] = category
+        context_dict['category_name_url'] = encode_url(category_name)
     except Category.DoesNotExist:
         pass
 
@@ -64,10 +65,42 @@ def add_category(request):
     return render(request, 'rangoapp/add_category.html', {'form': form}, context)
 
 
-def add_page(request):
+def encode_url(urlstr):
+    return '/rangoapp/category/{0}'.format(urlstr)
+
+
+def deocde_url(url):
+    try:
+        result = url.split('/')[3]
+    except:
+        result = ''
+    return result
+
+
+def add_page(request, category_name_url):
     context = RequestContext(request)
 
+    category_name = decode_url(category_name_url)
     if request.method == 'POST':
+        form = PageForm(request.POST)
+
+        if form.is_valid():
+            page = form.save(commit=False)
+
+            cat = Category.objects.get(name=category_name)
+            page.category = cat
+            page.views = 0
+            page.save()
         
+            return category(request, category_name_url)
+    
+        else:
+            print(form.errors)
+    else:
+        form = PageForm()
 
-
+    return render(request,  'rangoapp/add_page.html',
+            {'category_name_url': category_name_url,
+             'category_name': category_name,
+             'form': form},
+             context)

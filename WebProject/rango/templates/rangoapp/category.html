@@ -7,6 +7,9 @@
 
 <body>
     <h1>{{ category_name }}</h1>
+    <a href="/rangoapp/{{ category_name }}/add_page?category_name_url={{ category_name_url }}">
+    Add a New Page
+    </a>
     {% if category %}
     {% if pages %}
     <ul>
