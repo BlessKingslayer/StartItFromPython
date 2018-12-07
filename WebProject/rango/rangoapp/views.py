@@ -3,8 +3,11 @@ from django.http import HttpResponse
 from django.template import RequestContext
 from rangoapp.models import Category, Page
 from rangoapp.form import CategoryForm, PageForm
+import urllib.parse
 
 
+#region 主页相关
+# 主页
 def index(request):
     context = RequestContext(request)
 
@@ -19,8 +22,12 @@ def index(request):
     for category in category_list:
         category.url = category.name.replace(' ', '_')
     return render_to_response('rangoapp/index.html', context_dict, context)
+#endregion
 
 
+#region page页 相关
+
+# 处理page请求
 def page(request):
     context = RequestContext(request)
     return render_to_response('rangoapp/about.html', None, context)
@@ -28,7 +35,42 @@ def page(request):
     #     'Rango Says: Here is the about page. <a href="/rangoapp/">back to main</a>'
     # )
 
+# 新增 page
+def add_page(request, category_name_url):
+    context = RequestContext(request)
 
+    category_name = decode_url(category_name_url)
+    if request.method == 'POST':
+        form = PageForm(request.POST)
+
+        if form.is_valid():
+            page = form.save(commit=False)
+
+            cat = Category.objects.get(name=category_name)
+            page.category = cat
+            page.views = 0
+            page.save()
+
+            return category(request, category_name_url)
+
+        else:
+            print(form.errors)
+    else:
+        form = PageForm()
+
+    return render(
+        request, 'rangoapp/add_page.html', {
+            'category_name_url': category_name_url,
+            'category_name': category_name,
+            'form': form
+        }, context)
+
+
+#endregion
+
+
+#region category页 相关
+# 种类category页
 def category(request, category_name_url):
     context = RequestContext(request)
     category_name = category_name_url.replace('_', ' ')
@@ -45,7 +87,7 @@ def category(request, category_name_url):
 
     return render_to_response('rangoapp/category.html', context_dict, context)
 
-
+# 新增种类
 def add_category(request):
     context = RequestContext(request)
 
@@ -65,42 +107,19 @@ def add_category(request):
     return render(request, 'rangoapp/add_category.html', {'form': form}, context)
 
 
+#endregion
+
+
+#region 非请求处理方法
 def encode_url(urlstr):
-    return '/rangoapp/category/{0}'.format(urlstr)
+    return urllib.parse.quote(urlstr)
 
 
-def deocde_url(url):
+def decode_url(url):
     try:
-        result = url.split('/')[3]
+        result = urllib.parse.unquote(url)
     except:
         result = ''
     return result
 
-
-def add_page(request, category_name_url):
-    context = RequestContext(request)
-
-    category_name = decode_url(category_name_url)
-    if request.method == 'POST':
-        form = PageForm(request.POST)
-
-        if form.is_valid():
-            page = form.save(commit=False)
-
-            cat = Category.objects.get(name=category_name)
-            page.category = cat
-            page.views = 0
-            page.save()
-        
-            return category(request, category_name_url)
-    
-        else:
-            print(form.errors)
-    else:
-        form = PageForm()
-
-    return render(request,  'rangoapp/add_page.html',
-            {'category_name_url': category_name_url,
-             'category_name': category_name,
-             'form': form},
-             context)
+#endregion
