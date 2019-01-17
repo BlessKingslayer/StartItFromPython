@@ -15,7 +15,11 @@
         Rango Says: <strong>在此注册！</strong>
 
         <form action="/rangoapp/register/" id="user_form" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
+            {% csrf_token %} <!--对应后端views代码中必须要用render()渲染 否则会报错-->
+
+            <!-- Display each form. The as_p method wraps each element in a paragraph
+                 (<p>) element. This ensures each element appears on a new line,
+                 making everything look neater. -->
             {{ user_form.as_p }}
             {{ profile_form.as_p }}
             <input type="submit" name="submit" value="注册">

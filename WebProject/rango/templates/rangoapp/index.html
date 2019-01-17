@@ -12,7 +12,14 @@
 
 <body>
     <a href="/rangoapp/register/">在此注册</a>
+    <a href="/rangoapp/login/">在此登录</a>
+
+    {% if user.is_authenticated  %}
+    <h1>Rango says...hello {{user.username}}}! </h1>
+    {% else %}
     <h1>Rango says...hello world! </h1>
+    {% endif %}
+
     <a href="/rangoapp/add_category/">Add a New Category</a>
     {% if categories %}
         <ul>

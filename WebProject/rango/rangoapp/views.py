@@ -1,8 +1,10 @@
 from django.shortcuts import render, render_to_response
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
+from django.contrib.auth import authenticate, login
 from rangoapp.models import Category, Page
 from rangoapp.form import CategoryForm, PageForm, UserForm, UserProfileForm
+from django.contrib.auth.decorators import login_required
 import urllib.parse
 
 
@@ -137,12 +139,36 @@ def register(request):
         user_form = UserForm()
         profile_form = UserProfileForm()
 
-    return render_to_response(
+    return render(request,
         'rangoapp/register.html', {
             'user_form': user_form,
             'profile_form': profile_form,
             'registered': registered
         }, context)
+
+
+def user_login(request):
+    content = RequestContext(request)
+
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                return HttpResponseRedirect('/rangoapp')
+            else:
+                return HttpResponse('你的RangoApp账户已经被冻结!')
+        else:
+            print('登录失败, 详情:{0}, {1}'.format(username, password))
+            return HttpResponse('无效的登录名或密码!')
+
+    else:
+        return render(request, 'rangoapp/login.html', {}, content)
+
 
 #endregion
 
@@ -158,5 +184,10 @@ def decode_url(url):
     except:
         result = ''
     return result
+
+
+@login_required
+def restricted(request):
+    return HttpResponse("Since you're logged in, you can see this text!")
 
 #endregion
