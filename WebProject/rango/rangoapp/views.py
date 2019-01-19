@@ -1,7 +1,7 @@
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from rangoapp.models import Category, Page
 from rangoapp.form import CategoryForm, PageForm, UserForm, UserProfileForm
 from django.contrib.auth.decorators import login_required
@@ -23,7 +23,7 @@ def index(request):
 
     for category in category_list:
         category.url = category.name.replace(' ', '_')
-    return render_to_response('rangoapp/index.html', context_dict, context)
+    return render(request, 'rangoapp/index.html', context_dict, context)
 #endregion
 
 
@@ -156,7 +156,7 @@ def user_login(request):
 
         user = authenticate(username=username, password=password)
 
-        if user is not None:
+        if user is not None and user is not None:
             if user.is_active:
                 login(request, user)
                 return HttpResponseRedirect('/rangoapp')
@@ -170,6 +170,15 @@ def user_login(request):
         return render(request, 'rangoapp/login.html', {}, content)
 
 
+@login_required
+def user_logout(request):
+    logout(request)
+    return HttpResponseRedirect('/rangoapp')
+
+
+@login_required
+def restricted(request):
+    return HttpResponse("Since you're logged in, you can see this text!")
 #endregion
 
 
@@ -185,9 +194,5 @@ def decode_url(url):
         result = ''
     return result
 
-
-@login_required
-def restricted(request):
-    return HttpResponse("Since you're logged in, you can see this text!")
 
 #endregion
