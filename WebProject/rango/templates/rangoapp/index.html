@@ -1,16 +1,11 @@
-<!DOCTYPE html>
+{% extends "rangoapp/base.html" %}
 
 {% load static %}
 {% load globalfunc %}
 
-<html>
+{% block title %}RangoApp{% endblock title %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Rango</title>
-</head>
-
-<body>
+{% block body_block %}
     {% if user.is_authenticated %}
     <h1>Rango says...hello {{user.username}}! </h1>
     <a href="/rangoapp/restricted/">Restricted Page</a><br />
@@ -43,6 +38,5 @@
     <a href="/admin/">SuperAdmin</a>
     <br />
     <img src="{% static "rango.jpg" %}" alt="Picture of Rango" />
-</body>
 
-</html>
+{% endblock %}

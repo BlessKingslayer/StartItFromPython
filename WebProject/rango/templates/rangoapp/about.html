@@ -1,20 +1,13 @@
-<!DOCTYPE html>
+{% extends "rangoapp/base.html" %}
 
 {% load static %}
 
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Rango About</title>
-    
-</head>
-<body>    
+{% block title %}RangoApp About{% endblock title %}
+
+{% block body_block %}    
     <div style="text-align: center">
         <h2 style="display: inline">City West</h2>&nbsp;
         <a href="/rangoapp/">back to main</a>
     </div>
     <img src="{% static 'maps/citywest.jpg' %}" alt="City West" width=1300 height=700>
-</body>
-</html>
+{% endblock %}

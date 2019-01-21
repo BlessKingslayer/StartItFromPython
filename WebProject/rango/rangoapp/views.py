@@ -87,7 +87,7 @@ def category(request, category_name_url):
     except Category.DoesNotExist:
         pass
 
-    return render_to_response('rangoapp/category.html', context_dict, context)
+    return render(request, 'rangoapp/category.html', context_dict, context)
 
 # 新增种类
 def add_category(request):
@@ -178,7 +178,8 @@ def user_logout(request):
 
 @login_required
 def restricted(request):
-    return HttpResponse("Since you're logged in, you can see this text!")
+    content = RequestContext(request)
+    return render(request, 'rangoapp/restricted.html', {}, content)
 #endregion
 
 

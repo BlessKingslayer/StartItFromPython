@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>RangoApp</title>
-</head>
-<body>
+{% extends "rangoapp/base.html" %}
+{% block title %}RangoApp{% endblock title %}
+{% block body_block %}
     <h1>增加一个Category</h1>
     <form action="/rangoapp/add_category/" id="category_form" method="POST">
     {% csrf_token %}
@@ -22,5 +16,4 @@
 
     <input type="submit" name="submit" value="Create Category">
     </form>
-</body>
-</html>
+{% endblock %}
