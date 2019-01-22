@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from rangoapp.models import Category, Page
 from rangoapp.form import CategoryForm, PageForm, UserForm, UserProfileForm
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
 import urllib.parse
 
 
@@ -23,7 +24,39 @@ def index(request):
 
     for category in category_list:
         category.url = category.name.replace(' ', '_')
-    return render(request, 'rangoapp/index.html', context_dict, context)
+    response = render(request, 'rangoapp/index.html', context_dict, context)
+
+    #region COOKIES
+    visits = int(request.COOKIES.get('visits', '0'))
+
+    if 'last_visit' in request.COOKIES:
+        last_visit = request.COOKIES['last_visit']
+        last_visit_time = datetime.strptime(last_visit[:-7], '%Y-%m-%d %H:%M:%S')
+        if (datetime.now() - last_visit_time).days > 0:
+            response.set_cookie('visits', visits + 1)
+            response.set_cookie('last_visit', datetime.now())
+
+    else:
+        response.set_cookie('last_visit', datetime.now())
+    #endregion
+
+    #region SESSION
+    if request.session.get('last_visit2'):
+        last_visit_time2 = request.session.get('last_visit2')
+        visits2 = request.session.get('visits2', 0)
+
+        if (datetime.now() - datetime.strptime(last_visit_time2[:-7],
+                                               "%Y-%m-%d %H:%M:%S")).days > 0:
+            request.session['visits2'] = visits2 + 1
+            request.session['last_visit2'] = str(datetime.now())
+
+    else:
+        # The get returns None, and the session does not have a value for the last visit.
+        request.session['last_visit2'] = str(datetime.now())
+        request.session['visits2'] = 1
+    #endregion
+
+    return response
 #endregion
 
 
@@ -114,6 +147,10 @@ def add_category(request):
 
 #region user 相关
 def register(request):
+    if request.session.test_cookie_worked():
+        print('>>>>>> TEST COOKIE WORKED!')
+        request.session.delete_test_cookie()
+
     context = RequestContext(request)
     registered = False
 
