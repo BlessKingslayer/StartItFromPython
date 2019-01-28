@@ -2,13 +2,24 @@
 {% block title %}RangoApp{% endblock title %}
 {% block body_block %}
     <h1>登录 RangoApp</h1>
-    <form action="/rangoapp/login/" id="login_form" method="post">
-    {% csrf_token %}
-    Username: <input type="text" name="username" value="" size="50">
-    <br>
-    Password: <input type="text" name="password" value="" size="50">
-    <br>
+    <div class="container">
+        <form action="/rangoapp/login/" id="login_form" method="post"
+            class="form-signin span4">
+            <h2 class="form-signin-heading">请登录</h2>
+            {% csrf_token %}
 
-    <input type="submit" value="submit">
-    </form>
+            {% if bad_details %}
+            <p><strong>你的用户名或密码不正确!</strong></p>
+            {% elif disabled_account %}
+            <p><strong>你的rango账户未启用,不允许登录!</strong></p>
+            {% endif %}
+
+            用户名: <input type="text" class="input-block-level" placeholder="用户名" name="username" value="" size="50" />
+            <br>
+            密码: <input type="password" class="input-block-level" placeholder="密码" name="password" value="" size="50" />
+            <br>
+
+            <button type="submit" class="btn btn-primary">登录</button>
+        </form>
+    </div>
 {% endblock %}

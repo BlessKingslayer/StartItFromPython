@@ -58,12 +58,13 @@
                         <li><a href="/rangoapp/login/">登录</a></li>
                         {% endif %}
                     </ul>
-                    <ul class="nav">
+                    <ul class="nav">                        
                         {% if user.is_authenticated %}
                         <li><a href="/rangoapp/restricted/">个人主页</a></li>
                         <li><a href="/rangoapp/add_category/">新增类别</a></li>
                         {% endif %}
                         <li><a href="/rangoapp/about/">关于</a></li>
+                        <li><a href="/admin/">超级管理员</a></li>
                     </ul>
                 </div>
                 <!--/.nav-collapse -->
