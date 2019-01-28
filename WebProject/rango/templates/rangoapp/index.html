@@ -7,17 +7,17 @@
 
 {% block body_block %}
     {% if user.is_authenticated %}
-    <h1>Rango says...hello {{user.username}}! </h1>
-    <a href="/rangoapp/restricted/">Restricted Page</a><br />
-    <a href="/rangoapp/logout/">Logout</a><br />
+    <h3>Rango 说...你好 {{user.username}}! </h3>
+    <a href="/rangoapp/restricted/">个人页面</a><br />
+    <a href="/rangoapp/logout/">注销</a><br />
     {% else %}
-    <h1>Rango says...hello world! </h1>
+    <h3>Rango 说...你好 world! </h3>
     <a href="/rangoapp/register/">在此注册</a>
     <a href="/rangoapp/login/">在此登录</a>
     {% endif %}
 
     <br>
-    <a href="/rangoapp/add_category/">Add a New Category</a>
+    <a href="/rangoapp/add_category/">新增一个 Category</a>
     {% if categories %}
         <ul>
             {% for category in categories %}
@@ -34,8 +34,8 @@
         <strong>There are no categories present.</strong>
     {% endif %}
 
-    <a href="/rangoapp/about/">About</a>
-    <a href="/admin/">SuperAdmin</a>
+    <a href="/rangoapp/about/">关于</a>
+    <a href="/admin/">超级管理员</a>
     <br />
     <img src="{% static "rango.jpg" %}" alt="Picture of Rango" />
 

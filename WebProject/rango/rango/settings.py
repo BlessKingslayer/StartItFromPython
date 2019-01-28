@@ -138,4 +138,5 @@ LOGIN_URL = '/rangoapp/login/'
 # 如果配为False或者没有配置，
 # 可以使用 SESSION_COOKIE_AGE 来设置cookie时长，单位是秒,
 # 1209600 则表示网站的cookie时效为两周
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_COOKIE_AGE = 1209600

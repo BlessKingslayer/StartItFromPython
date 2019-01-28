@@ -65,7 +65,9 @@ def index(request):
 # 处理page请求
 def page(request):
     context = RequestContext(request)
-    return render_to_response('rangoapp/about.html', None, context)
+    visits2 = request.session.get('visits2', 0)
+    context_dict = {'visit_count': visits2}
+    return render_to_response('rangoapp/about.html', context_dict, context)
     # return HttpResponse(
     #     'Rango Says: Here is the about page. <a href="/rangoapp/">back to main</a>'
     # )
