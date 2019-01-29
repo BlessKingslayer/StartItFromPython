@@ -1,65 +1,31 @@
 import json
-import urllib, urllib.request
+import requests
+from urllib import parse
 
-def run_query(search_terms):
-    text_analytics_base_url = "https://westcentralus.api.cognitive.microsoft.com/text/analytics/v2.0/"
-    source = 'Web'
-    root_url = text_analytics_base_url
+subscriptionKey = '3284bc328b4e42cdbb7f4b146244f1a7'
+customConfigId = '11f16227-8322-496c-a278-22259435252d'
+# searchTerm = "湖人"
 
-    # Specify how many results we wish to be returned per page.
-    # Offset specifies where in the results list to start from.
-    # With results_per_page = 10 and offset = 11, this would start from page 2.
-    results_per_page = 10
-    offset = 0
+# url = 'https://api.cognitive.microsoft.com/bingcustomsearch/v7.0/search?' \
+#     + 'q=' + searchTerm + '&' + 'customconfig=' + customConfigId + '&' + 'count=10'
 
-    # Wrap quotes around our query terms as required by the Bing API.
-    # The query we will then use is stored within variable query.
-    query = "'{0}'".format(search_terms)
-    query = urllib.parse.quote(query)
+# r = requests.get(url, headers={'Ocp-Apim-Subscription-Key': subscriptionKey})
+# print(r.text)
 
-    # Construct the latter part of our request's URL.
-    # Sets the format of the response to JSON and sets other properties.
-    search_url = "{0}{1}?$format=json&$top={2}&$skip={3}&Query={4}".format(
-        root_url, source, results_per_page, offset, query)
+# a = json.loads(r.text)
 
-    # Setup authentication with the Bing servers.
-    # The username MUST be a blank string, and put in your API key!
-    username = ''
-    bing_api_key = '0bc14b5175134c73ac33c26120e7a5d8'
 
-    # Create a 'password manager' which handles authentication for us.
-    password_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
-    password_mgr.add_password(None, search_url, username, bing_api_key)
-
-    # Create our results list which we'll populate.
-    results = []
-
+def run_query(search_terms, count=10):
     try:
-        # Prepare for connecting to Bing's servers.
-        handler = urllib.request.HTTPBasicAuthHandler(password_mgr)
-        opener = urllib.request.build_opener(handler)
-        urllib.request.install_opener(opener)
+        urlbase = 'https://api.cognitive.microsoft.com/bingcustomsearch/v7.0/search?'
+        parms = {'customconfig': customConfigId, 'count': count, 'q': search_terms}
+        url = urlbase + parse.urlencode(parms)
+        r = requests.get(
+            url, headers={'Ocp-Apim-Subscription-Key': subscriptionKey})
+        resobj = json.loads(r.text)
+        return resobj['webPages']['value']
+    except Exception as e:
+        print(e.value)
+        return []
 
-        # Connect to the server and read the response generated.
-        response = urllib.request.urlopen(search_url).read()
-
-        # Convert the string response to a Python dictionary object.
-        json_response = json.loads(response)
-
-        # Loop through each page returned, populating out results list.
-        for result in json_response['d']['results']:
-            results.append({
-                'title': result['Title'],
-                'link': result['Url'],
-                'summary': result['Description']
-            })
-
-    # Catch a URLError exception - something went wrong when connecting!
-    except urllib.request.URLError as e:
-        print("Error when querying the Bing API: ", e)
-
-    # Return the list of results to the calling function.
-    return results
-
-
-print(run_query('中国'))
+# run_query('湖人')

@@ -1,0 +1,37 @@
+{% extends "rangoapp/base.html" %}
+{% load static %}
+{% block title %}
+搜索
+{% endblock title %}
+
+{% block body_block %}
+<div class="hero-unit">
+    <h1>搜索</h1>
+    <br/>
+
+    <div class="container-fluid">
+        <form class="form-signin span8" id="user_form" method="post" action="/rangoapp/search/">
+            {% csrf_token %}
+            <!-- Display the search form elements here -->
+            <input type="text" size="50" name="query" value="" id="query" placeholder="搜索内容"/>
+            <input type="number" size="10" name="count" value="10" id="count" placeholder="搜索数量"/>
+            <input class="btn btn-primary" type="submit" name="submit" value="Search" />
+            <br />
+        </form>
+
+        {% if result_list %}
+        <!-- Display search results in an ordered list -->
+        <div style="clear: both;">
+            <ol>
+            {% for result in result_list %}
+                <li>
+                    <strong><a href="{{ result.url }}">{{ result.name }}</a></strong><br />
+                    <em>{{ result.snippet }}</em>
+                </li>
+            {% endfor %}
+            </ol>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock body_block %}

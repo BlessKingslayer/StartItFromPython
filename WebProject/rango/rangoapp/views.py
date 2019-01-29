@@ -6,7 +6,9 @@ from rangoapp.models import Category, Page
 from rangoapp.form import CategoryForm, PageForm, UserForm, UserProfileForm
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
+from rangoapp.bing_search import run_query
 import urllib.parse
+
 
 
 #region 主页相关
@@ -62,7 +64,7 @@ def index(request):
 
 #region page页 相关
 
-# 处理page请求
+# 处理page请求about页面
 def page(request):
     context = RequestContext(request)
     visits2 = request.session.get('visits2', 0)
@@ -234,5 +236,22 @@ def decode_url(url):
         result = ''
     return result
 
+
+#endregion
+
+
+#region 搜索页
+def search(request):
+    context = RequestContext(request)
+    result_list = []
+
+    if request.method == 'POST':
+        query = request.POST['query'].strip()
+        count = request.POST['count'].strip()
+        count = int(count) if count and int(count) > 0 else 10
+        if query:
+            result_list = run_query(query, count)
+
+    return render(request, 'rangoapp/search.html', {'result_list': result_list}, context)
 
 #endregion
