@@ -54,7 +54,7 @@ queuelib==1.5.0
 redis==2.10.6
 requests==2.19.1
 rope==0.11.0
-Scrapy==1.5.0
+Scrapy==2.6.1
 selenium==3.14.0
 service-identity==17.0.0
 six==1.11.0
