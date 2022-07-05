@@ -39,7 +39,7 @@ pyasn1==0.4.3
 pyasn1-modules==0.2.1
 pybloom-live==2.3.2
 pybloomfilter==1.0
-pycares==2.3.0
+pycares==4.2.0
 pycparser==2.18
 PyDispatcher==2.0.5
 pylint==1.8.4
